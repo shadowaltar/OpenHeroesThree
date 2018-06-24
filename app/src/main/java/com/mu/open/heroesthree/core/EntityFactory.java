@@ -23,6 +23,7 @@ import com.mu.open.heroesthree.components.SkillsComponent;
 import com.mu.open.heroesthree.entities.ArmyEntity;
 import com.mu.open.heroesthree.entities.EntityType;
 import com.mu.open.heroesthree.entities.HeroEntity;
+import com.mu.open.heroesthree.entities.MapEntity;
 import com.mu.open.heroesthree.entities.StructureEntity;
 
 public class EntityFactory {
@@ -47,17 +48,17 @@ public class EntityFactory {
             entity.components.add(new ModifierTargetComponent());
         } else if (blueprint.type == EntityType.CITY) {
             entity = new StructureEntity();
-            AddGeneralComponents(entity);
+            addGeneralComponents(entity);
             entity.components.add(new CoordinateComponent(CoordinateType.WORLD_MAP));
             entity.components.add(new CityStructureComponent());
         } else if (blueprint.type == EntityType.STRUCTURE) {
             entity = new StructureEntity();
-            AddGeneralComponents(entity);
+            addGeneralComponents(entity);
             entity.components.add(new CoordinateComponent(CoordinateType.WORLD_MAP));
             entity.components.add(new ModifierProviderComponent());
         } else if (blueprint.type == EntityType.HERO) {
             entity = new HeroEntity();
-            AddGeneralComponents(entity);
+            addGeneralComponents(entity);
             entity.components.add(new ArmiesComponent());
             entity.components.add(new PrimaryStatisticsComponent());
             entity.components.add(new ArtifactsComponent());
@@ -67,14 +68,21 @@ public class EntityFactory {
             entity.components.add(new CoordinateComponent(CoordinateType.WORLD_MAP));
             entity.components.add(new MovementComponent());
             entity.components.add(new ModifierTargetComponent());
+        } else if (blueprint.type == EntityType.MAP) {
+            entity = new MapEntity();
+            addGeneralComponents(entity);
         }
         return entity;
     }
 
-    private void AddGeneralComponents(Entity entity) {
+    private void addGeneralComponents(Entity entity) {
         entity.components.add(new NameComponent());
         entity.components.add(new IconComponent());
         entity.components.add(new FactionComponent());
         entity.components.add(new OwnerComponent());
+    }
+
+    public Entity newMap() {
+        return create(EntityBlueprint.map());
     }
 }

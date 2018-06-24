@@ -1,0 +1,51 @@
+OpenHeroesThree Logic Flow
+
+Bootstrap Loop
+* Init Title Screen
+
+In Title Screen
+* On New Game: init New Game Screen
+* On Load Game: init Load Game Screen
+* On Run Map Editor
+* On Credit
+* On Settings
+* Accept gesture: press
+
+In New Game Screen
+* On New Skirmish Game: init New Skirmish Game Screen
+* On New Campaign: init Select Campaign Screen
+* Accept gesture: press
+
+In New Skirmish Game Screen
+* Read Map Meta Info
+* On map selected: read Factions, Heroes, Faction Presets of map.
+* On OK: init Preparation Screen
+* Accept gesture: press
+
+Preparation Game, if type = reading game
+* Read Map Meta Info
+* Read Structure, Army, Faction, Player, Hero, Item definitions.
+* Read Map content
+* Read previous Map State if any
+* On loaded: init Game Screen
+* Accept gesture: press
+
+In Game Map Screen
+* Init HUD View
+* Init Map View
+* Accept
+* On Structure selected
+* On Hero selected
+* On HUG command pressed
+* Accept gesture: tap, free-drag, double-tap, press-n-hold
+
+=== In Game Map Screen, On Hero selected
+* Show Hero Action Menu on HUD, including commands: Move, Details, Magic
+* On Move Action selected: init Movement Area Map Overlay
+** On Hero selected if owner-type = self: init Hero Exchange HUD Overlay
+** On Hero selected if owner-type = ally: same as above
+** On Hero selected if owner-type = enemy: init Combat View
+* On Details selected: init Hero Details HUD Overlay
+* On Magic selected: init Map Magic HUD Overlay
+
+=== In Game Map Screen, on Structure selected, if structure-type = city
