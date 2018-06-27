@@ -8,8 +8,7 @@ import java.util.List;
 /**
  * An entity for an Army. It contains the following components:
  * * Name
- * * Image
- * * Animations
+ * * Images and Icons
  * * Faction
  * * Player Owned
  * * Battleground Coordinates
