@@ -1,35 +1,42 @@
 package com.mu.open.heroesthree.graphics;
 
-import android.graphics.Canvas;
 import android.util.Log;
-import android.view.SurfaceHolder;
 
 public class GraphicThread extends Thread {
-    private int fps = 20;
-    private boolean isRunning = false;
-    private final GraphicSurface view;
-    private final SurfaceHolder holder;
+    private boolean running = false;
+    private GraphicEngine engine;
 
-    public GraphicThread(GraphicSurface view, SurfaceHolder holder) {
-        this.view = view;
-        this.holder = holder;
+    public GraphicThread(GraphicEngine engine) {
+        this.engine = engine;
     }
 
     public void run() {
-        while (isRunning) {
-            Canvas canvas = null;
+        long startTime;
+        while (running) {
+            startTime = System.nanoTime();
             try {
-                canvas = view.getHolder().lockCanvas();
-                synchronized (view.getHolder()) {
-                    view.draw(canvas);
-                }
+                engine.lockCanvas();
+                engine.drawOneFrame();
             } catch (Exception e) {
                 Log.e("GraphicThread", "run: ", e);
             } finally {
-                if (canvas != null) {
-                    view.getHolder().unlockCanvasAndPost(canvas);
-                }
+                engine.unlockCanvas();
+            }
+            // throttling
+            long now = System.nanoTime();
+            long waitTime = (now - startTime) / 1000000;
+            if (waitTime < 10) {
+                waitTime = 10; // ms
+            }
+            try {
+                // Sleep.
+                sleep(waitTime);
+            } catch (InterruptedException e) {
             }
         }
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
     }
 }

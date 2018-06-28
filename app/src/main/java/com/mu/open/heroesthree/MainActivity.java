@@ -11,6 +11,7 @@ import com.mu.open.heroesthree.graphics.GraphicEngine;
 public class MainActivity extends AppCompatActivity {
 
     private GraphicEngine graphics;
+    private Engine engine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,9 +22,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeEngine() {
-        new Engine();
-        graphics = new GraphicEngine();
+        engine = new Engine();
 
+        graphics = new GraphicEngine();
+        graphics.initialize(this);
     }
 
     private void setFullScreen() {
