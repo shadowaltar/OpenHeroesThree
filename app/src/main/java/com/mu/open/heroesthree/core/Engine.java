@@ -1,5 +1,6 @@
 package com.mu.open.heroesthree.core;
 
+import com.mu.open.heroesthree.graphics.GraphicEngine;
 import com.mu.open.heroesthree.managers.ComponentManager;
 import com.mu.open.heroesthree.managers.EntityManager;
 
@@ -7,6 +8,8 @@ public class Engine {
     private boolean isStopping;
     private EntityManager entityManager;
     private ComponentManager componentManager;
+
+    private GraphicEngine graphics;
 
     public Engine() {
         isStopping = false;
@@ -30,5 +33,10 @@ public class Engine {
 
     public void runOneLoop() {
 
+    }
+
+    public void initialize(GraphicEngine graphics) {
+        this.graphics = graphics;
+        graphics.getCurrentFrameSprites();
     }
 }

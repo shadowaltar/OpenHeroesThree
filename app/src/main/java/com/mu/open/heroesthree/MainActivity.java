@@ -16,8 +16,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         setFullScreen();
+        setContentView(R.layout.activity_main);
         initializeEngine();
     }
 
@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
         graphics = new GraphicEngine();
         graphics.initialize(this);
+        engine.initialize(graphics);
     }
 
     private void setFullScreen() {

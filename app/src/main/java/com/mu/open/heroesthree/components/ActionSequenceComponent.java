@@ -7,4 +7,9 @@ public class ActionSequenceComponent extends Component {
     public int sequence;
     public boolean isFinished;
     public boolean isWaiting;
+
+    @Override
+    public void update() {
+
+    }
 }
