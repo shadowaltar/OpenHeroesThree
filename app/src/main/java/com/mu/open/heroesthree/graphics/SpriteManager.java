@@ -35,7 +35,7 @@ public class SpriteManager {
     }
 
     public static void initializeDefaultSpriteInfos() {
-        List<String> rawInfoStrings = readText(R.raw.default_tile_set_descriptor);
+        List<String> rawInfoStrings = readText(R.raw.TILESET_HEROES3_UNIT);
         for (int i = 0; i < rawInfoStrings.size(); i++) {
             SpriteInfo spriteInfo = parseInfo(rawInfoStrings.get(i));
         }
