@@ -1,0 +1,6 @@
+Tile, grassland
+Parameters
+RGB: 0,153,68; Size: 32x32; Count: 4
+Additional rendering steps
+1. add noise: 4%, Gaussian, Monotone
+2. pixelrise, mosaic: 4px
