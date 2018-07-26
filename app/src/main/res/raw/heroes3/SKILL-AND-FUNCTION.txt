@@ -1,160 +1,122 @@
 # Predefined Functions:
-# ADD(PARAMS), MULTIPLY(PARAMS), INT_FLOOR(PARAM0), RETURN(PARAM0), CONTAINS(PARAM0, PARAM1), RAND01()
+# ADD([?]), MULTIPLY([?]), INT_FLOOR(?), RETURN(?), CONTAINS([?], ?), RAND01(), OVERRIDE(BASE, EXTENSION, CONDITION=), DEF(?,?), EQUALS(?,?), LAMBDA(?), LAMBDA(?,?), ISTRUE(?), ISFALSE(?), APPEND([?],?),  REMOVE([?],?),  REMOVE_IF([?],?), LOOP_ALL(?,?,?,?), CONTINUE_LOOP(?), END_LOOP(?), IF(?), THEN([?]), OR_ELSE([?]), LOOP_IF(?,?)
+
 # Functions can also be expressed like below:
-# PARAM0.CONTAINS(PARAM1)
+# PARAM0.CONTAINS(PARAM1), or CONTAINS={PARAM0=PARAM0,PARAM1=PARAM1}
+# When function param is named (like "EXTENSION" in OVERRIDE),
+# it is a static param, a predefined value or runtime value.
+# otherwise it is denoted by ?, means it can only be resolved at runtime.
+# For unknown length of runtime param list (1 or more), it is [?].
+# For unknown length of runtime param map (1 or more), it is {?}.
 
-SKILL_EXECUTION_TYPE=[ACTIVE,PASSIVE]
+# Definition of Label
+# Label can be a map, a list, a single value, a piece of function, or simply
+# stands for a specific string itself.
+# Defining the content of label, the label must be followed by "=".
 
-SKILL=[SPELL,HERO_SECONDARY_SKILL,CREATURE_SKILL]
+# Definition of List
+# List is a collection of items. Usually it contains labels.
+# Items of a list are surrounded by "[" and "]", separated by ",".
 
-SPELL=[
-	SPELL_BLOODLUST,
-	SPELL_CURE,
-	SPELL_HASTE,
-	SPELL_STONE_SKIN,
-]
+# Definition of Map
+# Map is a collection of named/labelled items, a list of key-value pairs.
+# Items of a map are surrounded by "{" and "}", separated by ",".
+# Key and Value must be defined in one item of a map, separated by "=".
+# Value can be anything, like a list, another map, a label, or even a function.
+# If the map label is followed by (), it is a parameterized map.
 
-HERO_SECONDARY_SKILL=[
-	SECONDARY_SKILL_SCOUTING,
-	SECONDARY_SKILL_EARTH_MAGIC,
-	SECONDARY_SKILL_TACTICS,
-	SECONDARY_SKILL_LOGISTICS,
-]
+# Access a member of List or Map
+# Use dot-notation to access any member of a list or map. Index is zero-based.
+# E.g. LIST_EXAMPLE=[ITEM1,ITEM2], TEMP_VARIABLE=LIST_EXAMPLE.0
+# E.g. MAP_EXAMPLE={KEY1=ITEM1,KEY2=ITEM2], TEMP_VARIABLE1=MAP_EXAMPLE.KEY1 or
+# TEMP_VARIABLE2=MAP_EXAMPLE.0, TEMP_VARIABLE1.EQUALS(TEMP_VARIABLE2)
 
-CREATURE_SKILL=[
-	SKILL_ARCHANGEL_RESURRECTION,
-	SKILL_ARCHANGEL_HATRED,
-	SKILL_ARCHANGEL_MORALE_BOOST,
-	SKILL_PHOENIX_REBIRTH,
-	SKILL_MAGIC_RESISTENCE,
-]
+# Defining Sub-types
+# Defining the subtypes of a label, the label must be followed by ":", and then a list
+# of labels. The items in the list are the subtypes of the label.
+# NOTE: it is mandatory if a sub list / map is defined via Inheritance.
 
+# Definition of Function
+# Function is a collection of sequentially ordered functions.
+# It must contain at least one RETURN(), which is to output a value.
+# So in the end the smallest function must be those predefined functions like ADD().
+# A function's signature is a FunctionLabel with ParamList and FunctionBody,
+# ParamList is a list of labels which "[]" is replaced by "()";
+# Body is another list, which contains combination of predefined/user-defined functions.
+# ParamList follows FunctionLabel without any separator.
+# FunctionBody follows ParamList with assignment operator "=".
+# E.g. HELLO(P1,P2)=[DEF(X),ASSIGN(X,ADD(P1,P2)),RETURN(X),]
 
-##########
-# Spells #
-##########
+# Definition of Lambda Expression
+# A lambda expression is defined using function LAMBDA(). The parameter
+# passed in to the anonymous function is denoted by "_".
+# E.g. LAMBDA(_.EQUALS(A_LABEL)).
+# This is equivalent to this expression: LAMBDA(DEF(_),_.EQUALS(A_LABEL))
+# For multiple parameters to be passed in, e.g.: LAMBDA(DEF(A,B),A.EQUALS(B))
 
-SPELL_BLOODLUST(EXECUTION_WHEN,TARGET_COUNT,R)={
-	EXECUTION=ACTIVE,
-	EXECUTION_WHEN=EXECUTION_WHEN,
-	CHANNELLING=INSTANT,
-	DURATION=PERMANENT,
-	TARGET_TYPE=TARGET_TYPE,
-	TARGET_COUNT=TARGET_COUNT,
-	BLACKLIST_TARGET=[UNDEAD,NONLIVING,ELEMENTAL,MACHINE],
-	MODIFIER={
-		ON=MELEE_ATTACK,
-		VALUE_FUNCTION=ADD,
-		VALUE_FUNCTION_PARAMETER=[3,MELEE_ATTACK],
-	},
-}
+# Parameterized List and Map
+# Same as function, but without any RETURN() functions, and this is also the only
+# way to distinguish between a parameterized-list and a function, since both uses [].
+# For a map it is fine as it always uses {} to wrap the items inside.
 
-SPELL_BLOODLUST=[SPELL_BLOODLUST_BASIC,SPELL_BLOODLUST_ADVANCED,SPELL_BLOODLUST_EXPERT]
-SPELL_BLOODLUST_BASIC=SPELL_BLOODLUST(AFTER_USER_SELECTION,3,FRIENDLY_SINGLE,1)
-SPELL_BLOODLUST_ADVANCED=SPELL_BLOODLUST(AFTER_USER_SELECTION,6,FRIENDLY_SINGLE,1)
-SPELL_BLOODLUST_EXPERT=SPELL_BLOODLUST(AFTER_SKILL_SELECTION,6,FRIENDLY_ALL,0)
+# List and Map Inheritance
+# Syntax for list: SUB_LIST = SUPER_LIST(OPTIONAL_PARAMS)
+# Syntax for map: SUB_MAP = SUPER_MAP(OPTIONAL_PARAMS)
+# Usually given a parameterized super list / map, by filling in some parameters, then
+# assign to a new label as its sub list / map.
+# NOTE: "SUPER_LABEL:[SUB_LABELS]" syntax is mandatory to define the sub-types.
 
-###################
-# Creature skills #
-###################
+# If-then-else structure
+# IF, THEN, OR_ELSE
 
-SKILL_ARCHANGEL_RESURRECTION(STACK_NUMBER)={
-	EXECUTION=ACTIVE,
-	EXECUTION_WHEN=AFTER_USER_SELECTION,
-	CHANNELLING=INSTANT,
-	DURATION=PERMANENT,
-	TARGET_TYPE=FRIENDLY_SINGLE,
-	TARGET_COUNT=1,
-	BLACKLIST_TARGET=[UNDEAD,NONLIVING,ELEMENTAL,MACHINE],
-	MODIFIER={
-		ON=HP,
-		VALUE_FUNCTION=MULTIPLY,
-		VALUE_FUNCTION_PARAMETER=[100,STACK_NUMBER],
-	},
-}
+# Looping structure
+# LOOP_ALL, CONTINUE_LOOP, END_LOOP; LOOP_IF
 
-SKILL_HATRED(TARGET,DAMAGE)={
-	EXECUTION=PASSIVE,
-	EXECUTION_WHEN=WHOLE_BATTLE,
-	CHANNELLING=NO,
-	DURATION=BATTLE,
-	TARGET_TYPE=ENEMY_BY_TYPE,
-	TARGET=TARGET,
-	MODIFIER={
-		ON=DAMAGE,
-		VALUE_FUNCTION=ADD,
-		VALUE_FUNCTION_PARAMETER=[1.5,ON],
-	},
-}
-
-SKILL_HATRED=[SKILL_ARCHANGEL_HATRED,SKILL_ANGEL_HATRED,SKILL_ARCHDEMON_HATRED,SKILL_DEMON_HATRED,SKILL_BLACK_DRAGON_HATRED]
-
-# Skill inheritance
-SKILL_ARCHANGEL_HATRED=SKILL_HATRED([DEVIL,ARCHDEVIL],DAMAGE)
-
-# Archangel Morale Boost is applied for the whole battle.
-# Returns the modified/boosted morale on all friendly units.
-SKILL_ARCHANGEL_MORALE_BOOST={
-	EXECUTION=PASSIVE,
-	EXECUTION_WHEN=WHOLE_BATTLE,
-	CHANNELLING=NO,
-	DURATION=BATTLE,
-	TARGET_TYPE=FRIENDLY_ALL,
-	EXCLUDED_TARGET=[UNDEAD,NONLIVING,ELEMENTAL,MACHINE],
-	MODIFIER={
-		ON=MORALE,
-		VALUE_FUNCTION=ADD,
-		VALUE_FUNCTION_PARAMETER=[1,ON],
-	},
-}
-
-# Phoenix rebirth is triggered after a Phoenix stack enters Death state.
-# Requires the stack's stack number.
-# Returns the stack number which can be revived.
-SKILL_PHOENIX_REBIRTH(STACK_NUMBER)={
-	EXECUTION=PASSIVE,
-	EXECUTION_WHEN=AFTER_DEATH,
-	CHANNELLING=NO,
-	DURATION=PERMANENT,
-	TARGET_TYPE=SELF,
-	MODIFIER={
-		ON=STACK_NUMBER,
-		VALUE_FUNCTION=FUNC_PHOENIX_REBIRTH,
-		VALUE_FUNCTION_PARAMETER=[0.2,STACK_NUMBER],
-	}
-}
-
-# Magic resistence is settled when a unit is hit by magic.
-# Requires the magic's labels, and the incoming damage.
-# Returns the damage after resistence is applied.
-SKILL_MAGIC_RESISTENCE(HIT_BY_MAGIC_TYPE,TARGET_MAGIC,DAMAGE)={
-	EXECUTION=PASSIVE_BEFORE_HIT_BY_MAGIC,
-	EXECUTION_WHEN=BEFORE_HIT_BY,
-	EXECUTION_WHEN_PARAMETER=MAGIC,
-	EXECUTION_FUNCTION_PARAMETER=INCOMING_MAGIC_TYPE,
-	CHANNELLING=NO,
-	DURATION=BATTLE,
-	TARGET_TYPE=SELF,
-	TARGET=[TARGET_MAGIC], # DEFAULT
-	MODIFIER={
-		ON=DAMAGE,
-		VALUE_FUNCTION=FUNC_MAGIC_RESISTENCE,
-		VALUE_FUNCTION_PARAMETER=[TARGET,INPUT[0],0,DAMAGE],
-	},
-}
+DURATION_TYPE:[NONE,ROUND_BASED,REAL_TIME]
 
 ###########################
 # Definition of functions #
 ###########################
+FUNC_BLOODLUST(STATES,ATTACK_BONUS,MELEE_ATTACK)=[
+	DEF(UNIT_STATE_BLOODLUST, BLOODLUST_STATE),
+	BLOODLUST_STATE.MODIFIER.ON=MELEE_ATTACK,
+	
+	STATES.ADD(BLOODLUST_STATE),
+]
+FUNC_CURSE(STATES,ATTACK_BONUS,MELEE_ATTACK)=[
+	DEF(UNIT_STATE_CURSED, CURSE_STATE),
+	STATE.
+	STATES.ADD(STATE),
+]
 
-FUNC_MAGIC_RESISTENCE(TARGET,HIT_BY_MAGIC_TYPE,RESISTENCE,DAMAGE)={
-	IF(TARGET.CONTAINS(HIT_BY_MAGIC_TYPE))
-	{
-		RETURN(RESISTENCE*DAMAGE)
-	}
-	RETURN(DAMAGE)
-}
 
-FUNC_PHOENIX_REBIRTH(REBIRTH_RATIO,STACK_NUMBER)={
-	RETURN(INT_FLOOR(REBIRTH_RATIO*STACK_NUMBER)+RAND01()*REBIRTH_RATIO*STACK_NUMBER)
-}
+FUNC_MAGIC_RESISTANCE(TARGET,HIT_BY_MAGIC_TYPE,RESISTANCE,DAMAGE)=[
+	IF(CONTAINS(TARGET,HIT_BY_MAGIC_TYPE)),
+	THEN(
+		RETURN(MULTIPLY(RESISTANCE,DAMAGE))
+	),
+	RETURN(DAMAGE),
+]
+
+FUNC_PHOENIX_REBIRTH(REBIRTH_RATIO,STACK_NUMBER)=[
+	RETURN(
+		ADD(
+			INT_FLOOR(MULTIPLY(REBIRTH_RATIO,STACK_NUMBER)),
+			MULTIPLY(RAND01,REBIRTH_RATIO,STACK_NUMBER),
+		)
+	)
+]
+
+FUNC_CURE(CURE_POINT,POWER,MAX_HP)=[
+	RETURN(POWER.MULTIPLY(5).ADD(CURE_POINT).MAX(MAX_HP), RESULT)
+]
+
+# Definition of predefined functions
+
+REMOVE_IF(COLLECTION,LAMBDA_FUNC)=[
+	LOOP_ALL(DEF(I),DEF(X),COLLECTION,LOOP_LABEL),
+		IF(LAMBDA_FUNC(X)),
+		THEN(COLLECTION.REMOVE(X)),
+	CONTINUE_LOOP(LOOP_LABEL),
+	RETURN(),
+]
