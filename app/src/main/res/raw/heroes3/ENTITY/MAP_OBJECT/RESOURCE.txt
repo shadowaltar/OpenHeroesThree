@@ -1,0 +1,9 @@
+RESOURCE:[
+	GOLD,
+	WOOD,
+	ORE,
+	MERCURY,
+	SULFUR,
+	CRYSTAL,
+	GEMS,
+]
