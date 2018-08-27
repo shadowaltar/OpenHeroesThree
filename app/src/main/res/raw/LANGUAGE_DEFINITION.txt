@@ -1,0 +1,49 @@
+# Unary operator: U; operand 1: O1
+# Binary operator: B; operand 1: O1, operand 2: O2
+# Label: identifier, or name of an instance or definition, or enum or string.
+# ConcreteLabel: instance of Label, not a definition.
+
+# '=', O2 defines O1, or O2 is the complement of O1
+# ':', is-a, O2 is O1; O2 must be a list
+# ',', separator of list elements, types, parameters, pairs etc.
+# '[', start of list
+# ']', end of list
+# '=' inside '['']', O1 is a concrete label, O2 is complement
+# '{', start of map
+# '}', end of map
+# ',' inside '{''}', separator of pairs
+# '=' inside '{''}', O2 (value) is mapped to O1 (key)
+# '<', start of type definition (list)
+# '>', end of type definition (list)
+# ',' inside '<''>', separator of types; if types are less than elements, elements will be implicitly determined
+# '(', start of collection unknown value/function parameter list
+# ')', end of collection unknown value/function parameter list
+
+
+
+SampleLabel:[Label1,Label2,Label3]
+SampleList0(Var1,Var2)=[
+	Label1,
+	Label2={
+		Label2A=Var1,
+		Label2B=StringLabel,
+	},
+	Label3,
+]
+SampleMap0(Var1,Var2)={
+	Key0=Label0,
+	Key1=SampleList0(Var1,Var2)
+	Key2={
+		SubMapKey0=SubMapLabel0,
+	},
+	Key3="StringExample",
+	Key4=12345,
+	Key5=[
+		SubListLabel0,
+		SubListLabel1,
+	]
+}
+SampleMap1={
+	Type<SampleLabel>=,
+	MyProperties<SampleMap0>=,
+}
