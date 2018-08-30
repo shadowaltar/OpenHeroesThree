@@ -78,17 +78,31 @@ GAME_STATE:[
 	AWAITING_DIALOG_DECISION,
 ]
 
-SCHEDULER={
-	TYPE<SCHEDULER_TYPE>=,
-	SEQUENCE_FUNCTION<FUNCTION,LIST>=,
+Scheduler={
+	Type<SchedulerType>=,
+	Phrase<BattlePhrase>=,
+	BeforeStart<Function,List>=,
+	AfterAction<Function,List>=,
+	AvailableActions<List<UserAction>>=,
 }
 
-BATTLE_SCHEDULER={
-	TYPE=ROUND_BASED,
-	SEQUENCE_FUNCTION={
-		FUNCTION=FUNC_DETERMIN_BATTLE_SEQUENCE,
+Scheduler:[RoundBasedBattleScheduler]
+SchedulerType:[RoundBased,TickBased]
+BattlePhrase:[Tactical,Battle]
+UserAction:[BattleAction]
+BattleAction:[ShowOptions,TacticalSkip,TacticalPhraseEnd,Surrender,Retreat,CastMagic,UnitMove,UnitWait,UnitDefend,UnitCastMagic]
+RoundBasedBattleScheduler={
+	Type=RoundBased,
+	Phrase=,
+	AvailableActions=[],
+	BeforeStart={
+		Function=FuncInitialize
+	},
+	SequenceFunction={
+		Function=FuncDetermineBattleSequence,
 		FUNCTION_PARAMETERS=[],
 	},
+	OnActionHandler=,
 	PHRASES=[
 		TACTICAL={
 			ACTIONS={
@@ -105,10 +119,19 @@ BATTLE_SCHEDULER={
 		
 	}
 }
+FuncInitialize=DefFunc([*Scheduler<Scheduler>,Attacker<Hero>,Defender<Hero>],
+	[
+		Var(AttackerSkill, Attacker.SecondarySkills.Get(SkillTactics)),
+		Var(DefenderSkill, Defender.SecondarySkills.Get(SkillTactics)),
+		Var(FinalSkillLevel, AttackerSkill.Level-DefenderSkill.Level),
+		Then(AvailableAction.Add([ShowOptions,TacticalSkip,TacticalPhraseEnd,UnitMove]),
+	]
+)
+FuncDetermineBattleSequence=DefFunc([Attacker<Hero>,Defender<Hero>,ArenaType<ArenaType>],
+	[],
+)
 
-
-
-
+Enumerate=DefFunc([
 
 
 
