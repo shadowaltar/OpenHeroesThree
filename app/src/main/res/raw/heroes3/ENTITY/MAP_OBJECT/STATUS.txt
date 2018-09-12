@@ -2,33 +2,36 @@
 # STATUS #
 ##########
 
-UNIT_STATUS={
-	STATUS_TYPE=,
+HeroStatus={
+	Type<HeroStatusType>=,
+}
+
+HeroStatusType:[
+	Flying,
+	SearchedHolyGrail,
+]
+
+UnitStatus={
+	Type<UnitStatusType>=,
 	TICK_TYPE=,
 	TICK_COUNT=,
 	REMAINING_TICK_COUNT=,
 	LABELS=[],
 	RESULTS=[],
 }
-UNIT_STATUS:[
+UnitStatus:[
 	UNIT_NEURTRAL_STATUS,
 	UNIT_BUFF,
 	UNIT_DEBUFF,
 ]
 
-STATUS_TYPE:[BUFF,NEUTRAL,DEBUFF]
+UnitStatusType:[BUFF,NEUTRAL,DEBUFF]
 
 TICK_TYPE=[NO_TICK,PER_ROUND]
 
-UNIT_BUFF(UNIT)={
-	TYPE=BUFF,
-	LABELS=[BUFF],
-	RESULTS={
-	},
-}
-UNIT_DEBUFF(UNIT)={
-	TYPE=DEBUFF,
-	LABELS=[DEBUFF],
-	RESULTS={
-	},
-}
+NewBuff=Func<UnitStatus>([],[
+	Return(UnitStatus={Type=Buff}.New())
+])])
+NewDebuff=Func<UnitStatus>([],[
+	Return(UnitStatus={Type=Debuff}.New())
+])])

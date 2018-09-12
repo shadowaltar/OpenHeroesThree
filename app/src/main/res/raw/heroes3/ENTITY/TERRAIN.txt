@@ -1,0 +1,20 @@
+TerrainType:[Grass,Dirt,Sand,Snow,Swamp,Rough,Subterranean,Lava,Water,Inaccessible]
+SecondaryTerrainType:[
+	CursedGround,MagicPlains,
+	HolyGround,EvilFog,CloverField,
+	FieryField,LucidPools,Rockland,MagicClouds,
+	FavorableWinds,
+]
+BackgroundTerrainType:[TerrainType,SecondaryTerrainType].Exclude([FavorableWinds,Inaccessible])
+
+GetBattlefieldTerrainType<BackgroundTerrainType>
+=Func(
+	[TerrainType<TerrainType>,SecondaryTerrainType<SecondaryTerrainType>],
+	[
+		If(BackgroundTerrainType.Contains(SecondaryTerrainType)),
+		Then(Return(SecondaryTerrainType)),
+		If(BackgroundTerrainType.Contains(TerrainType)),
+		Then(Return(TerrainType)),
+		Return(Grass),
+	]
+)

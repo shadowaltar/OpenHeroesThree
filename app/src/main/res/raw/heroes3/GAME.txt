@@ -91,17 +91,134 @@ SchedulerType:[RoundBased,TickBased]
 BattlePhrase:[Tactical,Battle]
 UserAction:[BattleAction]
 BattleAction:[ShowOptions,TacticalSkip,TacticalPhraseEnd,Surrender,Retreat,CastMagic,UnitMove,UnitWait,UnitDefend,UnitCastMagic]
-RoundBasedBattleScheduler={
+
+# battle -> original, moralewait, wait
+Phrase:[TacticalPhrase,NormalPhrase,MoraleBoostedWaitPhrase,WaitPhrase]
+Phrase={
+	States=[],
+	CurrentState<GameState>=,
+	AllowedActions=[],
+}
+TacticalPhrase={
+	TacticArea=
+}
+BattleFieldType:[
+	Rectangle,
+	RectangleInterlaced, 
+	RectangleInterlacedAlternative,
+	Isometric,
+	Graph,
+	Arbitrary,
+]
+CellType:[
+	Rectangle,
+	Hex,
+]
+BattleField(FieldType<FieldType>,CellType<CellType>,Width<Int>,Height<Int>)={
+	Type<BattleFieldType>=,
+	CustomFieldTypeCoordinates<List>=,
+	CellType<BattleFieldCellType>=,
+	BackgroundType<BattleFieldBackgroundType>=,
+	BattleFieldBackground=,
+}
+BattleFieldParams={
+	TerrainType<TerrainType>=,
+	SecondaryTerrainType<SecondaryTerrainType>=,
+	IsTown=False,
+	IsBeach=False,
+	FieldObjects=[],
+	FieldObjectPlacementFunction<Function>=,
+	BackgroundAssignmentFunction<Function>=,
+}
+# setup battlefield: background
+# place field objects: castle wall and npc
+# place attacker/defender objects
+Battle(
+	BattleFieldParams,
+	Attacker<Hero>,
+	Defender<Hero>
+)=
+{
+	Field=BattleField={
+		Type=RectangleInterlaced,
+		CellType=Hex,
+		TileSet=TileSet,
+		Width=15,
+		Height=11,
+		FieldObjects=FieldObjects,
+		BackgroundType<BackgroundTerrainType>=
+			GetBattlefieldTerrainType(BattleFieldParams.TerrainType,
+				BattleFieldParams.SecondaryTerrainType),
+	},
+	States=[
+		PlaceUnits,
+		PlaceFieldObjects,
+		
+	],
+	StateRelationships=[
+		# place units, field objects, check if tactical skill is in effect
+		PlaceUnits->PlaceFieldObjects->CheckTactics,
+		CheckTactics.TacticExists->SetTactic->CheckRoundStart,
+		CheckTactics.TacticNotExists->CheckRoundStart,
+		# perform any round-start specific action (and check victory cond), then get the next active unit
+
+		CheckRoundStart.Normal->DequeueNextUnit,
+		CheckRoundStart.HasRoundStartAction->PerformRoundStartAction->CheckVictory,
+		CheckVictory.Victory->Victory,
+		CheckVictory.Normal+PreviousState=PerformRoundStartAction->DequeueNextUnit,
+		
+		# before player or cpu can move, the units fetch one by one shall check if they cannot move (or other effects) first
+		DequeueNextUnit->CheckUnitStatusBeforeAction,
+		ChekUnitStatusBeforeAction.UnitDead->CheckVictory, # if unit is dead, check if opponent wins
+		ChekUnitStatusBeforeAction.Skip->DequeueNextUnit, # if unit is low morale or is frightened, find next unit
+		ChekUnitStatusBeforeAction.AutoCast->UnitCastAwaitAction,
+		ChekUnitStatusBeforeAction.Normal->AwaitAction,
+		
+		UnitPerformAction.PerformedAttack->CheckTargetStatus,
+		CheckTargetStatus.TookDamage->UnitPerformCounterAction,
+		CheckTargetStatus.UnitDead->CheckVictory,
+		UnitPerformCounterAction.PerformedAttack->CheckTargetCounteredStatus,
+		UnitPerformCounterAction.PerformedCastSpell->CheckTargetCounteredStatus,
+		CheckTargetCounteredStatus.TookDamage->CheckHighMorale,
+		CheckTargetCounteredStatus.UnitDead->CheckVictory, # end of attack+counter-attack
+		CheckMorale.MoraleHigh->
+		
+		UnitPerformAction.PerformedCastSpell->CheckTargetSpellReaction,
+		UnitPerformAction.PerformedWait->Put
+		UnitPerformAction.PerformedDefence->DequeueNextUnit,
+		
+		# victory cond check
+		CheckVictory.Victory->Victory,
+		CheckVictory.Continue->CheckCounterAction, #?
+	]
+	UnitPlacementFunction<Function>=,
+	Scheduler=RoundBasedBattleScheduler(Attacker,Defender,BattleFieldParams.),
+	Attacker=Attacker,
+	Defender=Defender,
+	NonPlayerableAttackUnits=,
+	NonPlayerableDefendUnits=,
+	NeutralUnits=,
+	UnitPlacementFunction=PlaceUnitToBattleField(Field,,
+	FieldObjectGenerationAndPlacementFunction<Function>=, # need to consider town type battle
+	Town=,
+}
+
+RoundBasedBattleScheduler(Attacker<Hero>,Defender<Hero>)={
 	Type=RoundBased,
-	Phrase=,
-	AvailableActions=[],
-	BeforeStart={
-		Function=FuncInitialize
+	CurrentState<BattleState>=,
+	PreTasks<Function>=[
+		PlaceUnits(
+		GoToTacticalPhraseState(Attacker,Defender),
+	],
+	RoundPhrases<Phrase>=[NormalPhrase,MoraleBoostedWaitPhrase,WaitPhrase],
+	PostTasks<Function>=[ShowSummary],
+	PhraseState={
+		TacticalPhrase=[TacticalMoveState],
+		BattlePhrase=[UnitBadMoraleCheck,UnitAutoCast,UserControlUnitAction,
 	},
-	SequenceFunction={
-		Function=FuncDetermineBattleSequence,
-		FUNCTION_PARAMETERS=[],
-	},
+	RoundActions=[
+		HeroCastSpell,Surrender,Retreat,
+	],
 	OnActionHandler=,
 	PHRASES=[
 		TACTICAL={
@@ -119,19 +236,33 @@ RoundBasedBattleScheduler={
 		
 	}
 }
-FuncInitialize=DefFunc([*Scheduler<Scheduler>,Attacker<Hero>,Defender<Hero>],
+GoToTacticalPhraseState=Func([*Scheduler<Scheduler>,Attacker<Hero>,Defender<Hero>],[
+	AttackerSkillLevel=Attacker.SecondarySkills.First(#SkillTactics).Level,
+	DefenderSkillLevel=Defender.SecondarySkills.First(#SkillTactics).Level,
+	If(AttackerSkillLevel!=DefenderSkillLevel),
+	Then([Tactical=New(TacticalPhrase),])
+	Return(),
+])
+
+PlaceUnitToBattleField=Func(
+	[Field,AttackUnits<List<Unit>>],
 	[
-		Var(AttackerSkill, Attacker.SecondarySkills.Get(SkillTactics)),
-		Var(DefenderSkill, Defender.SecondarySkills.Get(SkillTactics)),
-		Var(FinalSkillLevel, AttackerSkill.Level-DefenderSkill.Level),
-		Then(AvailableAction.Add([ShowOptions,TacticalSkip,TacticalPhraseEnd,UnitMove]),
 	]
 )
+
+AssignBattleground=Func(
+	[TerrainType<TerrainType>,SecondaryTerrainType<SecondaryTerrainType>],
+	[
+		rGetBattlefieldTerrainType(TerrainType,
+	]
+)
+
 FuncDetermineBattleSequence=DefFunc([Attacker<Hero>,Defender<Hero>,ArenaType<ArenaType>],
 	[],
 )
 
-Enumerate=DefFunc([
+GetSubs=ExternalDefFunc<List>([Label],"GetImmediateSubTypes") # get the enum members or immediate sub types
 
+First=ExternalDefFunc<Label>([List<Label>,Label],"FirstOfType") # get the instance which is the first appearance of a certain label/type.
 
 

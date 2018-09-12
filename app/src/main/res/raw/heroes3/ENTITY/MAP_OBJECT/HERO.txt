@@ -1,73 +1,97 @@
+###########
+# Faction #
+###########
+
+Faction={
+	Type<FactionType>=,
+	Color<Color>=,
+}
 
 ########
 # Hero #
 ########
 
-HERO={
-	NAME=,
-	FULLNAME=,
-	IMAGE=,
-	DESCRIPTION=,
-	GENDER=,
-	RACE=,
-	LEVEL=1,
-	EXPERIENCE=0,
-	TOWN=,
-	ATTACK=0,
-	DEFENSE=0,
-	POWER=0,
-	KNOWLEDGE=0,
-	MIN_MANA=0,
-	MAX_MANA=0,
-	SPELL_ROUND=0,
-	SPECIALTY_SKILL=,
-	SECONDARY_SKILLS=[],
-	UNITS={},
-	ATTACK_LEARNING_PROBABLITY=[],
-	DEFENSE_LEARNING_PROBABLITY=[],
-	POWER_LEARNING_PROBABLITY=[],
-	KNOWLEDGE_LEARNING_PROBABLITY=[],
-	SECONDARY_SKILL_LEARNING_PROBABILITY=[],
-	SECONDARY_SKILL_EXCLUSION=[],
-	ARTIFACTS=[],
-	SPELLS=[],
-	STARTING_SECONDARY_SKILLS=[],
-	STARTING_UNIT_PROBABILITY=[],
-	STATUS=[],
+Hero={
+	Name=,
+	FullName=,
+	Image=,
+	Description=,
+	Gender=,
+	Race=,
+	Faction=,
+	Level=1,
+	Experience=0,
+	Town=,
+	Attack=0,
+	Defence=0,
+	Power=0,
+	Knowledge=0,
+	MinMana=0,
+	MaxMana=0,
+	MovementPoint=0,
+	SpellRound=0, # effective round of buff or debuff
+	SpecialitySkill<HeroSpecialitySkill>=, # hero speciality
+	SecondarySkills<SecondarySkill>=[],
+	Units<Unit>=[],
+	AttackLearningProbabilities<ProbabilityWithLevels>=[],
+	DefenseLearningProbabilities<ProbabilityWithLevels>=[],
+	PowerLearningProbabilities<ProbabilityWithLevels>=[],
+	KnowledgeLearningProbabilities<ProbabilityWithLevels>=[],
+	SecondarySkillLearningProbabilities<SecondarySkillLearningProbability>=[],
+	SecondarySkillExclusion<>=[],
+	Artifacts<Item>=[],
+	Spells<Spell>=[],
+	StartingSecondarySkills<SecondarySkill>=[],
+	StartingUnitProbabilities<UnitProbabilityWithCount>=[],
+	Status<HeroStatus>=[],
+	MapCoordinate<Coordinate>=,
 }
-HERO:[
-	HERO_KNIGHT,
-	HERO_ELEMENTALIST
+ProbabilityWithLevels={
+	Probability<Double>=0,
+	Levels<Int>=[],
+}
+SecondarySkillLearningProbability={
+	Skill<#SecondarySkill>=,
+	Probability<Double>=0,
+}
+UnitProbabilityWithCount={
+	Unit<#Unit>=,
+	Count<Int>=[],
+	Probability<Double>=0,
+}
+Hero:[
+	Knight,
+	Elementalist,
 ]
 
-HERO_KNIGHT:[
-	HERO_CHRISTIAN,
+Knight:[
+	Christian,
 ]
 
-HERO_KNIGHT={
+Knight={
 	TOWN=CASTLE,
 	ATTACK=2,
 	DEFENSE=2,
 	POWER=1,
 	KNOWLEDGE=1,
-	ATTACK_LEARNING_PROBABLITY=[
-		{PROBABLITY=0.35, APPLICABLE_LEVEL=[2...9]},
-		{PROBABLITY=0.3, APPLICABLE_LEVEL=[10...]},
+	AttackLearningProbabilities=[
+		{0.35,[2..9]},
+		{0.3, [10..]},
 	],
-	DEFENSE_LEARNING_PROBABLITY=[
-		{PROBABLITY=0.45, APPLICABLE_LEVEL=[2...9]},
-		{PROBABLITY=0.3, APPLICABLE_LEVEL=[10...]},
+	DefenseLearningProbabilities=[
+		{0.45, [2..9]},
+		{0.3, [10..]},
 	],
-	POWER_LEARNING_PROBABLITY=[
-		{PROBABLITY=0.1, APPLICABLE_LEVEL=[2...9]},
-		{PROBABLITY=0.2, APPLICABLE_LEVEL=[10...]},
+	PowerLearningProbabilities=[
+		{0.1, [2..9]},
+		{0.2, [10..]},
 	],
-	KNOWLEDGE_LEARNING_PROBABLITY=[
-		{PROBABLITY=0.1, APPLICABLE_LEVEL=[2...9]},
-		{PROBABLITY=0.2, APPLICABLE_LEVEL=[10...]},
+	KnowledgeLearningProbabilities=[
+		{0.1, [2..9]},
+		{0.2, [10..]},
 	],
 	SECONDARY_SKILL_LEARNING_PROBABILITY=[
-		{SKILL=SECONDARY_SKILL_SCOUTING, PROBABILITY=0.03571429},
+		{SKILL=SkillScouting, PROBABILITY=0.03571429},
 		{SKILL=SECONDARY_SKILL_EARTH_MAGIC, PROBABILITY=0.01785714},
 		{SKILL=SECONDARY_SKILL_TACTICS, PROBABILITY=0.0625},
 		{SKILL=SECONDARY_SKILL_LOGISTICS, PROBABILITY=0.0625},
@@ -75,7 +99,7 @@ HERO_KNIGHT={
 	SECONDARY_SKILL_EXCLUSION=[SECONDARY_SKILL_NECROMANCY],
 }
 
-HERO_CHRISTIAN={
+Christian={
 	FULLNAME="Christian the Knight",
 	DESCRIPTION="Christian was always more of a frontiersman than a Knight, having set foot in nearly every part of Enroth before finally settling into military service in Erathia. Though a wanderer and a bit of a dreamer, his battlefield tactics are feared throughout the world."
 	GENDER=MALE,
@@ -88,30 +112,30 @@ HERO_CHRISTIAN={
 	],
 }
 
-HERO_ELEMENTALIST={
+Elementalist={
 	TOWN=CONFLUX,
 	ATTACK=0,
 	DEFENSE=0,
 	POWER=3,
 	KNOWLEDGE=3,
 	ATTACK_LEARNING_PROBABLITY=[
-		{PROBABLITY=0.15, APPLICABLE_LEVEL=[2...9]},
-		{PROBABLITY=0.25, APPLICABLE_LEVEL=[10...]},
+		{0.15, [2..9]},
+		{0.25, [10..]},
 	],
 	DEFENSE_LEARNING_PROBABLITY=[
-		{PROBABLITY=0.15, APPLICABLE_LEVEL=[2...9]},
-		{PROBABLITY=0.25, APPLICABLE_LEVEL=[10...]},
+		{0.15, [2..9]},
+		{0.25, [10..]},
 	],
 	POWER_LEARNING_PROBABLITY=[
-		{PROBABLITY=0.35, APPLICABLE_LEVEL=[2...9]},
-		{PROBABLITY=0.25, APPLICABLE_LEVEL=[10...]},
+		{0.35, [2..9]},
+		{0.25, [10..]},
 	],
 	KNOWLEDGE_LEARNING_PROBABLITY=[
-		{PROBABLITY=0.35, APPLICABLE_LEVEL=[2...9]},
-		{PROBABLITY=0.25, APPLICABLE_LEVEL=[10...]},
+		{0.35, [2..9]},
+		{0.25, [10..]},
 	],
 	SECONDARY_SKILL_LEARNING_PROBABILITY=[
-		{SKILL=SECONDARY_SKILL_SCOUTING, PROBABILITY=0.03571429},
+		{SKILL=SkillScouting, PROBABILITY=0.03571429},
 		{SKILL=SECONDARY_SKILL_EARTH_MAGIC, PROBABILITY=0.01785714},
 		{SKILL=SECONDARY_SKILL_TACTICS, PROBABILITY=0.0625},
 		{SKILL=SECONDARY_SKILL_LOGISTICS, PROBABILITY=0.0625},

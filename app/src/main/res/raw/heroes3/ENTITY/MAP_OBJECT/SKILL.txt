@@ -1,49 +1,54 @@
-SKILL={
-	SKILL_EXECUTION_TYPE=,
+Skill={
+	Skill_Execution_Type=,
 }
-SKILL:[SPELL,HERO_SPECIALTY_SKILL,HERO_SECONDARY_SKILL,UNIT_SKILL]
-
-SKILL_EXECUTION_TYPE:[ACTIVE,PASSIVE]
-CHANNELLING:[NOT_APPLICABLE,INSTANT]
-
-SPELL:[
-	SPELL_BLOODLUST,
-	SPELL_CURE,
-	SPELL_CURSE,
-	SPELL_HASTE,
-	SPELL_STONE_SKIN,
-	SPELL_DISRUPTING_RAY,
+Skill:[
+	Spell,
+	HeroSpecialitySkill,
+	SecondarySkill,
+	Unit_Skill
 ]
 
-HERO_SPECIALTY_SKILL:[
-	SPECIALTY_SKILL_BALLISTA,
-	SPECIALTY_SKILL_DISRUPTING_RAY,
+Skill_Execution_Type:[Active,Passive]
+Channelling:[Not_Applicable,Instant]
+
+Spell:[
+	Spell_Bloodlust,
+	Spell_Cure,
+	Spell_Curse,
+	Spell_Haste,
+	Spell_Stone_Skin,
+	Spell_Disrupting_Ray,
 ]
 
-HERO_SECONDARY_SKILL:[
-	SECONDARY_SKILL_SCOUTING,
-	SECONDARY_SKILL_EARTH_MAGIC,
+Hero_Specialty_Skill:[
+	Specialty_Skill_Ballista,
+	Specialty_Skill_Disrupting_Ray,
+]
+
+SecondarySkill:[
+	SkillScouting,
+	Secondary_Skill_Earth_Magic,
 	SkillTactics,
-	SECONDARY_SKILL_LOGISTICS,
-	SECONDARY_SKILL_NECROMANCY,
-	SECONDARY_SKILL_RESISTANCE,
-	SECONDARY_SKILL_LEADERSHIP,
-	SECONDARY_SKILL_ARTILLERY,
-	SECONDARY_SKILL_ARCHERY,
-	SECONDARY_SKILL_WISDOM,
-	SECONDARY_SKILL_AIR_MAGIC,
+	Secondary_Skill_Logistics,
+	Secondary_Skill_Necromancy,
+	Secondary_Skill_Resistance,
+	Secondary_Skill_Leadership,
+	Secondary_Skill_Artillery,
+	Secondary_Skill_Archery,
+	Secondary_Skill_Wisdom,
+	Secondary_Skill_Air_Magic,
 ]
 
-UNIT_SKILL:[
-	SKILL_ARCHANGEL_RESURRECTION,
-	SKILL_ARCHANGEL_HATRED,
-	SKILL_ARCHANGEL_MORALE_BOOST,
-	SKILL_PHOENIX_REBIRTH,
-	SKILL_MAGIC_RESISTANCE,
+Unit_Skill:[
+	Skill_Archangel_Resurrection,
+	Skill_Archangel_Hatred,
+	Skill_Archangel_Morale_Boost,
+	Skill_Phoenix_Rebirth,
+	Skill_Magic_Resistance,
 ]
 
-SPECIALTY_SKILL=HERO_SPECIALTY_SKILL # Direct list assignment
-SECONDARY_SKILL=HERO_SECONDARY_SKILL # Direct list assignment
+Specialty_Skill=Hero_Specialty_Skill # Direct list assignment
+Secondary_Skill=Hero_Secondary_Skill # Direct list assignment
 
 ##########
 # Spells #
@@ -51,54 +56,54 @@ SECONDARY_SKILL=HERO_SECONDARY_SKILL # Direct list assignment
 #####################
 # Spells\Fire Magic #
 #####################
-SPELL_BLOODLUST:[SPELL_BLOODLUST_BASIC,SPELL_BLOODLUST_ADVANCED,SPELL_BLOODLUST_EXPERT]
-SPELL_BLOODLUST(UNIT,EXECUTE_WHEN,ATTACK_BONUS,TARGET_TYPE,TARGET_COUNT,DURATION)={
-	EXECUTION=ACTIVE,
-	EXECUTE_WHEN=EXECUTE_WHEN,
-	CHANNELLING=INSTANT,
-	TARGET_TYPE=TARGET_TYPE,
-	EXCLUDED_TARGETS=[UNDEAD,NONLIVING,ELEMENTAL,MACHINE],
-	LABELS=[FIRE_MAGIC,BUFF],
-	RESULTS={
-		FUNCTION=FUNC_BLOODLUST,
-		FUNCTION_PARAMETERS=[UNIT,DURATION,ATTACK_BONUS,UNIT.MELEE_ATTACK],
+Spell_Bloodlust:[Spell_Bloodlust_Basic,Spell_Bloodlust_Advanced,Spell_Bloodlust_Expert]
+Spell_Bloodlust(Unit,Execute_When,Attack_Bonus,Target_Type,Target_Count,Duration)={
+	Execution=Active,
+	Execute_When=Execute_When,
+	Channelling=Instant,
+	Target_Type=Target_Type,
+	Excluded_Targets=[Undead,Nonliving,Elemental,Machine],
+	Labels=[Fire_Magic,Buff],
+	Results={
+		Function=Func_Bloodlust,
+		Function_Parameters=[Unit,Duration,Attack_Bonus,Unit.Melee_Attack],
 	},
-	MAGIC_GUIDE_APPEARANCE_PROBABILITY={
-		INFERNO=0.53,
-		NECROPOLIS=0.32,
-		DUNGEON=0.3,
-		STRONGHOLD=0.53,
-		FORTRESS=0.31,
-		CONFLUX=0.31,
+	Magic_Guide_Appearance_Probability={
+		Inferno=0.53,
+		Necropolis=0.32,
+		Dungeon=0.3,
+		Stronghold=0.53,
+		Fortress=0.31,
+		Conflux=0.31,
 	},
 }
-SPELL_BLOODLUST_BASIC=SPELL_BLOODLUST(?,AFTER_USER_SELECT_UNIT,3,FRIENDLY_SINGLE,?)
-SPELL_BLOODLUST_ADVANCED=SPELL_BLOODLUST(?,AFTER_USER_SELECT_UNIT,6,FRIENDLY_SINGLE,?)
-SPELL_BLOODLUST_EXPERT=SPELL_BLOODLUST(?,AFTER_USER_SELECT_SKILL,6,FRIENDLY_ALL,?)
+Spell_Bloodlust_Basic=Spell_Bloodlust(?,After_User_Select_Unit,3,Friendly_Single,?)
+Spell_Bloodlust_Advanced=Spell_Bloodlust(?,After_User_Select_Unit,6,Friendly_Single,?)
+Spell_Bloodlust_Expert=Spell_Bloodlust(?,After_User_Select_Skill,6,Friendly_All,?)
 
-SPELL_CURSE:[SPELL_CURSE_BASIC,SPELL_CURSE_ADVANCED,SPELL_CURSE_EXPERT]
-SPELL_CURSE(UNIT,EXECUTE_WHEN,DURATION,TARGET_TYPE)={
-	EXECUTION=ACTIVE,
-	EXECUTE_WHEN=EXECUTE_WHEN,
-	CHANNELLING=INSTANT,
-	TARGET_TYPE=TARGET_TYPE,
-	EXCLUDED_TARGET=[UNDEAD,NONLIVING,ELEMENTAL,MACHINE],
-	LABELS=[MIND_MAGIC,FIRE_MAGIC,DEBUFF],
-	RESULTS={
-		FUNCTION=FUNC_CURSE,
-		FUNCTION_PARAMETERS=[UNIT,DURATION],
+Spell_Curse:[Spell_Curse_Basic,Spell_Curse_Advanced,Spell_Curse_Expert]
+Spell_Curse(Unit,Execute_When,Duration,Target_Type)={
+	Execution=Active,
+	Execute_When=Execute_When,
+	Channelling=Instant,
+	Target_Type=Target_Type,
+	Excluded_Target=[Undead,Nonliving,Elemental,Machine],
+	Labels=[Mind_Magic,Fire_Magic,Debuff],
+	Results={
+		Function=Func_Curse,
+		Function_Parameters=[Unit,Duration],
 	},
-	MAGIC_GUIDE_APPEARANCE_PROBABILITY={
-		TOWER=0.25,
-		TOWER_NO_LIB=0.20,
-		NECROPOLIS=0.54,
-		INFERNO=0.31,
-		DUNGEON=0.54,
+	Magic_Guide_Appearance_Probability={
+		Tower=0.25,
+		Tower_No_Lib=0.20,
+		Necropolis=0.54,
+		Inferno=0.31,
+		Dungeon=0.54,
 	},
 }
-SPELL_CURSE_BASIC=SPELL_CURSE(?,AFTER_USER_SELECT_UNIT,?,FRIENDLY_SINGLE)
-SPELL_CURSE_ADVANCED=SPELL_CURSE(?,AFTER_USER_SELECT_UNIT,?,FRIENDLY_SINGLE)
-SPELL_CURSE_EXPERT=SPELL_CURSE(?,AFTER_USER_SELECT_SKILL,?,FRIENDLY_ALL)
+Spell_Curse_Basic=Spell_Curse(?,After_User_Select_Unit,?,Friendly_Single)
+Spell_Curse_Advanced=Spell_Curse(?,After_User_Select_Unit,?,Friendly_Single)
+Spell_Curse_Expert=Spell_Curse(?,After_User_Select_Skill,?,Friendly_All)
 
 
 ######################
@@ -140,11 +145,10 @@ SPELL_CURE_ADVANCED=SPELL_CURE(?,AFTER_USER_SELECT_UNIT,20,FRIENDLY_SINGLE,?)
 SPELL_CURE_EXPERT=SPELL_CURE(?,AFTER_USER_SELECT_SKILL,30,FRIENDLY_ALL,?)
 
 #########################
-# Hero Specialty Skills #
+# Hero Speciality Skills #
 #########################
 
-HERO_SPECIALTY_SKILL={
-	LABELS=[],
+HeroSpecialitySkill={
 	RESULTS=[],
 }
 SPECIALTY_SKILL_BALLISTA(HERO,ENEMY_UNIT)={
