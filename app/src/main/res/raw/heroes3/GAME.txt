@@ -47,35 +47,70 @@ CUSTOM_LABEL_LIST=[
 	FRIENDLY_FIRE,UNDEAD,ELEMENTAL,MACHINE,
 ]
 
-GAME(BOOTSTRAP_ARGUMENTS)={
-	GAME_MODE=ROUND_BASED,
-	MAX_PLAYER_COUNT=8,
-	MAX_AI_PLAYER_COUNT=8,
-	MAP_MODE=MULTI_MAP,
-	MAP_SHAPE=RECTANGLE,
-}
+GameSchedulingType:[RoundBased]
+MapMode:[Single,Multi]
 
-GAME_PHRASE:[
-	BEFORE_GAME_START,
-	GAME_MAIN,
-	NEW_GAME_SCREEN,
-	NEW_GAME_CONFIG_SCREEN,
-	IN_GAME_LOADING_SCREEN,
-	USER_ROUND,
-	BATTLE_ROUND,
-	ENEMY_ROUND,
-	TOWN_SCREEN,
-	WORLD_MAP_SCREEN,
+Game={
+	SchedulingMode<GameSchedulingType>=RoundBased,
+	MaxPlayerCount=8,
+	MaxAIPlayerCount=8,
+	MapMode<MapMode>=Multi,
+},
+
+# Define Game States
+GameState=state({
+	AwaitUserInput=false,
+	PostState<Function>=,
+	Outcomes=[],
+}),
+BattleState=GameState
+AwaitInputBattleState=GameState{AwaitUserInput=true}
+GameState:[
+	BattleStart,
+	
+	PlaceUnits,
+	PlaceFieldObjects,
+	RunCustomActionBeforeBattle,
+	CheckTactics,
+	TacticalUnitMove,
+	
+	RunCustomActionsBeforeRound,
+	RunAutoUnitActionsBeforeRound,
+	DequeueUnit,
+	EnqueueRoundSurvivors,
+	RunAutoUnitActionsBeforeInput,
+	
+	UnitAttack,
+	SettleFieldObjectEffectAfterMoveBeforeAttack,
+	SettleAttackDamage,
+	Counter,
+	SettleCounterDamage,
+	UnitAttackAgain,
+	SettleDoubleAttackDamage,
+	
+	UnitUseSkill,
+	SettleUnitSpellDamage,
+	SettleUnitSkillEffect,
+	
+	SettleMorale,
+	
+	UnitDefend,
+	UnitActLater,
+	
+	UnitMove,
+	SettleFieldObjectEffectAfterMove,
+	
+	UseSkill,
+	SettlePlayerSkillDamage,
+	SettlePlayerSkillEffect,
+	
+	EscapeOrSurrender,
 ]
 
-GAME_STATE:[
-	NOTHING_SELECTED,
-	HERO_SELECTED,
-	HERO_DESTINATION_SELECTED,
-	HERO_MOVING,
-	HERO_ONBOARDING,
-	HERO_OFFBOARDING,
-	AWAITING_DIALOG_DECISION,
+AwaitInputBattleState={AwaitUserInput=true}
+AwaitInputBattleState:[
+	AwaitPlayerTacticalInput,
+	AwaitPlayerInput,
 ]
 
 Scheduler={
@@ -92,21 +127,10 @@ BattlePhrase:[Tactical,Battle]
 UserAction:[BattleAction]
 BattleAction:[ShowOptions,TacticalSkip,TacticalPhraseEnd,Surrender,Retreat,CastMagic,UnitMove,UnitWait,UnitDefend,UnitCastMagic]
 
-# battle -> original, moralewait, wait
-Phrase:[TacticalPhrase,NormalPhrase,MoraleBoostedWaitPhrase,WaitPhrase]
-Phrase={
-	States=[],
-	CurrentState<GameState>=,
-	AllowedActions=[],
-}
-TacticalPhrase={
-	TacticArea=
-}
-BattleFieldType:[
+
+BattleFieldLatticeType:[
 	Rectangle,
-	RectangleInterlaced, 
-	RectangleInterlacedAlternative,
-	Isometric,
+	RectangleInterlaced,
 	Graph,
 	Arbitrary,
 ]
@@ -114,8 +138,8 @@ CellType:[
 	Rectangle,
 	Hex,
 ]
-BattleField(FieldType<FieldType>,CellType<CellType>,Width<Int>,Height<Int>)={
-	Type<BattleFieldType>=,
+BattleField(CellType<CellType>,Width<Int>,Height<Int>)={
+	Type<BattleFieldLatticeType>=,
 	CustomFieldTypeCoordinates<List>=,
 	CellType<BattleFieldCellType>=,
 	BackgroundType<BattleFieldBackgroundType>=,
@@ -150,12 +174,7 @@ Battle(
 			GetBattlefieldTerrainType(BattleFieldParams.TerrainType,
 				BattleFieldParams.SecondaryTerrainType),
 	},
-	States=[
-		PlaceUnits,
-		PlaceFieldObjects,
-		
-	],
-	StateRelationships=[
+	StateRelationships=relationships([
 		# place units, field objects, check if tactical skill is in effect
 		PlaceUnits->PlaceFieldObjects->CheckTactics,
 		CheckTactics.TacticExists->SetTactic->CheckRoundStart,
@@ -190,7 +209,7 @@ Battle(
 		# victory cond check
 		CheckVictory.Victory->Victory,
 		CheckVictory.Continue->CheckCounterAction, #?
-	]
+	]),
 	UnitPlacementFunction<Function>=,
 	Scheduler=RoundBasedBattleScheduler(Attacker,Defender,BattleFieldParams.),
 	Attacker=Attacker,
