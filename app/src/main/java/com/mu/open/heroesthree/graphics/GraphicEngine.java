@@ -24,8 +24,6 @@ public class GraphicEngine {
     }
 
     public Sprite[] getCurrentFrameSprites() {
-
-        Sprite sprite = spriteManager.readFromResource(R.drawable.default_tile_set);
         return null;
     }
 

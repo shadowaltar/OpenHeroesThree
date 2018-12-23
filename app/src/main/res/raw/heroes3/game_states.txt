@@ -1,0 +1,136 @@
+# Define Game States
+GameState=state({
+	AwaitUserInput=false,
+	EnterState<Function>=,
+	Action<Function>=,
+	BeforeOutcome<Function>=,
+	Outcomes=[],
+}),
+AwaitInputBattleState=GameState{
+	AwaitUserInput=true,
+	AvailableUserInputs<UserInput>=[],
+}:[
+	AwaitPlayerTacticalInput,
+	AwaitPlayerInput,
+],
+GameState:[
+	PlaceUnits,
+	PlaceFieldObjects,
+	RunCustomActionBeforeBattle,
+	CheckTactics,
+	TacticalUnitMove,
+	
+	RunCustomActionsBeforeRound,
+	RunAutoUnitActionsBeforeRound,
+	DequeueUnit,
+	EnqueueRoundSurvivors,
+	RunAutoUnitActionsBeforeInput,
+	
+	UnitAttack,
+	SettleFieldObjectEffectAfterMoveBeforeAttack,
+	SettleAttackDamage,
+	Counter,
+	SettleCounterDamage,
+	UnitAttackAgain,
+	SettleDoubleAttackDamage,
+	
+	UnitUseSkill,
+	SettleUnitSpellDamage,
+	SettleUnitSkillEffect,
+	
+	SettleMorale,
+	
+	UnitDefend,
+	UnitActLater,
+	
+	UnitMove,
+	SettleFieldObjectEffectAfterMove,
+	
+	UseSkill,
+	SettlePlayerSkillDamage,
+	SettlePlayerSkillEffect,
+	
+	EscapeOrSurrender,
+],
+StateRelationships=relationships([
+		# place units, field objects, check if tactical skill is in effect
+		PlaceUnits->PlaceFieldObjects->CheckTactics,
+		CheckTactics.TacticExists->SetTactic->CheckRoundStart,
+		CheckTactics.TacticNotExists->CheckRoundStart,
+		# perform any round-start specific action (and check victory cond), then get the next active unit
+
+		CheckRoundStart.Normal->DequeueNextUnit,
+		CheckRoundStart.HasRoundStartAction->PerformRoundStartAction->CheckVictory,
+		CheckVictory.Victory->Victory,
+		CheckVictory.Normal+PreviousState=PerformRoundStartAction->DequeueNextUnit,
+		
+		# before player or cpu can move, the units fetch one by one shall check if they cannot move (or other effects) first
+		DequeueNextUnit->CheckUnitStatusBeforeAction,
+		ChekUnitStatusBeforeAction.UnitDead->CheckVictory, # if unit is dead, check if opponent wins
+		ChekUnitStatusBeforeAction.Skip->DequeueNextUnit, # if unit is low morale or is frightened, find next unit
+		ChekUnitStatusBeforeAction.AutoCast->UnitCastAwaitAction,
+		ChekUnitStatusBeforeAction.Normal->AwaitAction,
+		
+		UnitPerformAction.PerformedAttack->CheckTargetStatus,
+		CheckTargetStatus.TookDamage->UnitPerformCounterAction,
+		CheckTargetStatus.UnitDead->CheckVictory,
+		UnitPerformCounterAction.PerformedAttack->CheckTargetCounteredStatus,
+		UnitPerformCounterAction.PerformedCastSpell->CheckTargetCounteredStatus,
+		CheckTargetCounteredStatus.TookDamage->CheckHighMorale,
+		CheckTargetCounteredStatus.UnitDead->CheckVictory, # end of attack+counter-attack
+		CheckMorale.MoraleHigh->
+		
+		UnitPerformAction.PerformedCastSpell->CheckTargetSpellReaction,
+		UnitPerformAction.PerformedWait->Put
+		UnitPerformAction.PerformedDefence->DequeueNextUnit,
+		
+		# victory cond check
+		CheckVictory.Victory->Victory,
+		CheckVictory.Continue->CheckCounterAction, #?
+	]),
+
+PlaceUnits=GameState{
+	Outcomes=[
+		Normal=PlaceFieldObjects,
+	]
+},
+PlaceFieldObjects=GameState{
+}
+RunCustomActionBeforeBattle,
+CheckTactics,
+TacticalUnitMove,
+
+RunCustomActionsBeforeRound,
+RunAutoUnitActionsBeforeRound,
+DequeueUnit,
+EnqueueRoundSurvivors,
+RunAutoUnitActionsBeforeInput,
+
+UnitAttack,
+SettleFieldObjectEffectAfterMoveBeforeAttack,
+SettleAttackDamage,
+Counter,
+SettleCounterDamage,
+UnitAttackAgain,
+SettleDoubleAttackDamage,
+
+UnitUseSkill,
+SettleUnitSpellDamage,
+SettleUnitSkillEffect,
+
+SettleMorale,
+
+UnitDefend,
+UnitActLater,
+
+UnitMove,
+SettleFieldObjectEffectAfterMove,
+
+UseSkill,
+SettlePlayerSkillDamage,
+SettlePlayerSkillEffect,
+
+EscapeOrSurrender,
+
+AwaitPlayerTacticalInput,
+AwaitPlayerInput,

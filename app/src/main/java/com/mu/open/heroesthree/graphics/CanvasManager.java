@@ -12,13 +12,11 @@ public class CanvasManager {
         this.view = view;
     }
 
-    public void drawCenter(Sprite sprite, Canvas canvas) {
-        Bitmap image = sprite.getBitmap();
+    public void drawCenter(Bitmap image, Canvas canvas) {
         float imgW = image.getWidth();
         float imgH = image.getHeight();
         float viewW = view.getWidth();
         float viewH = view.getHeight();
-        canvas.drawBitmap(sprite.getBitmap(),
-                (viewW-imgW)/2, (viewH-imgH)/2,null);
+        canvas.drawBitmap(image, (viewW - imgW) / 2, (viewH - imgH) / 2, null);
     }
 }

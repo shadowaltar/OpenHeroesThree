@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.mu.open.heroesthree.R;
 import com.mu.open.heroesthree.framework.App;
 
 import java.io.BufferedReader;
@@ -26,19 +25,13 @@ public class SpriteManager {
     public synchronized Sprite readFromResource(int imageResId, int dimensionInfoResId) {
         Bitmap bitmap = BitmapFactory.decodeResource(App.getResources(), imageResId);
         List<String> rawDimensions = readText(dimensionInfoResId);
-        HashMap<String, int[][]> dimensions = new HashMap<>();
+        List<SpriteInfo> dimensions = new ArrayList<>();
         for (int i = 0; i < rawDimensions.size(); i++) {
             SpriteInfo spriteInfo = parseInfo(rawDimensions.get(i));
+            dimensions.add(spriteInfo);
         }
         Sprite sprite = new Sprite(bitmap, dimensions);
         return sprite;
-    }
-
-    public static void initializeDefaultSpriteInfos() {
-        List<String> rawInfoStrings = readText(R.raw.TILESET_HEROES3_UNIT);
-        for (int i = 0; i < rawInfoStrings.size(); i++) {
-            SpriteInfo spriteInfo = parseInfo(rawInfoStrings.get(i));
-        }
     }
 
     public static List<String> readText(int resId) {

@@ -1,0 +1,44 @@
+# LANGUAGE FILE IS DESCRIPTIVE, NOT MEANT FOR OVERRIDDING
+
+# SYSTEM LABEL
+
+# Function object consists of:
+# A list of parameters;
+# A block (List) of Statement which is to be executed sequentially.
+Function,
+
+# Statement object exists inside a Function
+# A statement may be linked to previously appear statements,
+# or ends the current Function.
+Statement,
+# State object is the abstraction of a status of a system, in a state machine.
+# It is an ordinary class, just it can be referred by one or more Transition instances.
+State,
+# Transition object describes how one state can be transitioned to another.
+# Special operator is used to link or chain two or more states together.
+Transition,
+
+# SYSTEM FUNCTIONS
+
+# returns a function; indicates the implementation is given by underlying system
+sysFunc<Function>(),
+# returns a function; implementation is given here
+func<Function>([],[Statement]),
+
+Statement:[
+	if(Statement,[Statement]),
+	then([Statement]),
+	elseif(Statement,[Statement]),
+	else([Statement]),
+	return(Statement),
+	
+]
+
+GetSubs=sysFunc<List>([Label],"GetImmediateSubTypes") # get the enum members or immediate sub types
+
+First=sysFunc<Label>([List<Label>,Label],"FirstOfType") # get the instance which is the first appearance of a certain label/type.
+
+# annotate the node of relationship
+state=sysFunc<State>()
+# defines 
+transitions([List<Relationship>])

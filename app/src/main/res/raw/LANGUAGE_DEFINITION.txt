@@ -3,8 +3,8 @@
 # Label: identifier, or name of an instance or definition, or enum or string.
 # ConcreteLabel: instance of Label, not a definition.
 
-# '=', O2 defines O1, or O2 is the complement of O1
-# ':', is-a, O2 is O1; O2 must be a list
+# '=', O2 defines O1, or O2 is the complement of O1. Equivalent: .DefinedBy()
+# ':', is-a, O2 elements are O1; O2 must be a list. Equivalent: .AreBaseOf()
 # ',', separator of list elements, types, parameters, pairs etc.
 # '[', start of list
 # ']', end of list
@@ -12,7 +12,7 @@
 # '{', start of map
 # '}', end of map
 # ',' inside '{''}', separator of pairs
-# '=' inside '{''}', O2 (value) is mapped to O1 (key)
+# '=' inside '{''}', O2 (value) is assigned/mapped to O1 (key). Equivalent: .DefinedBy()
 # '<', start of type definition (list)
 # '>', end of type definition (list)
 # ',' inside '<''>', separator of types; if types are less than elements, elements will be implicitly determined
@@ -21,23 +21,23 @@
 
 
 
-SampleLabel:[Label1,Label2,Label3]
-SampleList0(Var1,Var2)=[
+SampleLabels:[Label1,Label2,Label3]
+SampleList0=[
 	Label1,
 	Label2={
-		Label2A=Var1,
+		Label2A=,
 		Label2B=StringLabel,
 	},
 	Label3,
 ]
-SampleMap0(Var1,Var2)={
+SampleMap0={
 	Key0=Label0,
-	Key1=SampleList0(Var1,Var2)
+	Key1=SampleList0
 	Key2={
 		SubMapKey0=SubMapLabel0,
 	},
-	Key3="StringExample",
-	Key4=12345,
+	Key3="StringLiteral0",
+	Key4=0,
 	Key5=[
 		SubListLabel0,
 		SubListLabel1,
@@ -47,3 +47,8 @@ SampleMap1={
 	Type<SampleLabel>=,
 	MyProperties<SampleMap0>=,
 }
+Func(SampleFunction<ReturnType>,(ParamLabel1<ParamType1>,ParamLabel2<ParamType2>)=[
+	Variable1=Statement1,
+	Statement2,
+	
+])

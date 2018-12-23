@@ -57,62 +57,6 @@ Game={
 	MapMode<MapMode>=Multi,
 },
 
-# Define Game States
-GameState=state({
-	AwaitUserInput=false,
-	PostState<Function>=,
-	Outcomes=[],
-}),
-BattleState=GameState
-AwaitInputBattleState=GameState{AwaitUserInput=true}
-GameState:[
-	BattleStart,
-	
-	PlaceUnits,
-	PlaceFieldObjects,
-	RunCustomActionBeforeBattle,
-	CheckTactics,
-	TacticalUnitMove,
-	
-	RunCustomActionsBeforeRound,
-	RunAutoUnitActionsBeforeRound,
-	DequeueUnit,
-	EnqueueRoundSurvivors,
-	RunAutoUnitActionsBeforeInput,
-	
-	UnitAttack,
-	SettleFieldObjectEffectAfterMoveBeforeAttack,
-	SettleAttackDamage,
-	Counter,
-	SettleCounterDamage,
-	UnitAttackAgain,
-	SettleDoubleAttackDamage,
-	
-	UnitUseSkill,
-	SettleUnitSpellDamage,
-	SettleUnitSkillEffect,
-	
-	SettleMorale,
-	
-	UnitDefend,
-	UnitActLater,
-	
-	UnitMove,
-	SettleFieldObjectEffectAfterMove,
-	
-	UseSkill,
-	SettlePlayerSkillDamage,
-	SettlePlayerSkillEffect,
-	
-	EscapeOrSurrender,
-]
-
-AwaitInputBattleState={AwaitUserInput=true}
-AwaitInputBattleState:[
-	AwaitPlayerTacticalInput,
-	AwaitPlayerInput,
-]
-
 Scheduler={
 	Type<SchedulerType>=,
 	Phrase<BattlePhrase>=,
@@ -174,42 +118,7 @@ Battle(
 			GetBattlefieldTerrainType(BattleFieldParams.TerrainType,
 				BattleFieldParams.SecondaryTerrainType),
 	},
-	StateRelationships=relationships([
-		# place units, field objects, check if tactical skill is in effect
-		PlaceUnits->PlaceFieldObjects->CheckTactics,
-		CheckTactics.TacticExists->SetTactic->CheckRoundStart,
-		CheckTactics.TacticNotExists->CheckRoundStart,
-		# perform any round-start specific action (and check victory cond), then get the next active unit
-
-		CheckRoundStart.Normal->DequeueNextUnit,
-		CheckRoundStart.HasRoundStartAction->PerformRoundStartAction->CheckVictory,
-		CheckVictory.Victory->Victory,
-		CheckVictory.Normal+PreviousState=PerformRoundStartAction->DequeueNextUnit,
-		
-		# before player or cpu can move, the units fetch one by one shall check if they cannot move (or other effects) first
-		DequeueNextUnit->CheckUnitStatusBeforeAction,
-		ChekUnitStatusBeforeAction.UnitDead->CheckVictory, # if unit is dead, check if opponent wins
-		ChekUnitStatusBeforeAction.Skip->DequeueNextUnit, # if unit is low morale or is frightened, find next unit
-		ChekUnitStatusBeforeAction.AutoCast->UnitCastAwaitAction,
-		ChekUnitStatusBeforeAction.Normal->AwaitAction,
-		
-		UnitPerformAction.PerformedAttack->CheckTargetStatus,
-		CheckTargetStatus.TookDamage->UnitPerformCounterAction,
-		CheckTargetStatus.UnitDead->CheckVictory,
-		UnitPerformCounterAction.PerformedAttack->CheckTargetCounteredStatus,
-		UnitPerformCounterAction.PerformedCastSpell->CheckTargetCounteredStatus,
-		CheckTargetCounteredStatus.TookDamage->CheckHighMorale,
-		CheckTargetCounteredStatus.UnitDead->CheckVictory, # end of attack+counter-attack
-		CheckMorale.MoraleHigh->
-		
-		UnitPerformAction.PerformedCastSpell->CheckTargetSpellReaction,
-		UnitPerformAction.PerformedWait->Put
-		UnitPerformAction.PerformedDefence->DequeueNextUnit,
-		
-		# victory cond check
-		CheckVictory.Victory->Victory,
-		CheckVictory.Continue->CheckCounterAction, #?
-	]),
+	StateRelationships=StateRelationships,
 	UnitPlacementFunction<Function>=,
 	Scheduler=RoundBasedBattleScheduler(Attacker,Defender,BattleFieldParams.),
 	Attacker=Attacker,
@@ -222,6 +131,7 @@ Battle(
 	Town=,
 }
 
+# need revise
 RoundBasedBattleScheduler(Attacker<Hero>,Defender<Hero>)={
 	Type=RoundBased,
 	CurrentState<BattleState>=,
@@ -279,9 +189,5 @@ AssignBattleground=Func(
 FuncDetermineBattleSequence=DefFunc([Attacker<Hero>,Defender<Hero>,ArenaType<ArenaType>],
 	[],
 )
-
-GetSubs=ExternalDefFunc<List>([Label],"GetImmediateSubTypes") # get the enum members or immediate sub types
-
-First=ExternalDefFunc<Label>([List<Label>,Label],"FirstOfType") # get the instance which is the first appearance of a certain label/type.
 
 
